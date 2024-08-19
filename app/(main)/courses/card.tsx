@@ -1,9 +1,10 @@
+/* Imports */
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 import Image from "next/image";
 
 /**
- * Props type definition for the `Card` component.
+ * Type definition for the props of the `Card` component.
  * 
  * @typedef {Object} Props
  * @property {string} title - The title of the course to be displayed on the card.
@@ -30,8 +31,8 @@ type Props = {
  * @param {string} props.title - The title of the course.
  * @param {string} props.imageSrc - The source URL of the course image.
  * @param {number} props.id - The unique ID of the course.
- * @param {boolean} [props.active] - Whether the card is active (default is `false`).
- * @param {boolean} [props.disabled] - Whether the card is disabled, preventing interaction (default is `false`).
+ * @param {boolean} [props.active=false] - Whether the card is active (default is `false`).
+ * @param {boolean} [props.disabled=false] - Whether the card is disabled, preventing interaction (default is `false`).
  * @param {(id: number) => void} props.onClick - Function to handle click events, receiving the course ID.
  * 
  * @returns {JSX.Element} A styled card component.
