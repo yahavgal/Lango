@@ -11,3 +11,5 @@ const LessonLayout = ({ children }: Props) => {
         </div>
     )
 };
+
+export default LessonLayout;
