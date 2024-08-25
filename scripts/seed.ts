@@ -108,7 +108,7 @@ const main = async () => {
             {
                 id: 2,
                 challengeId: 1,
-                imageSrc: "woman.svg",
+                imageSrc: "/woman.svg",
                 correct: false,
                 text: "la mujer",
                 audioSrc: "/es_woman.mp3",
