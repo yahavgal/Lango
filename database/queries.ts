@@ -76,8 +76,10 @@ export const getUnits = cache(async () => {
 
 export const getCourseProgress = cache(async () => {
     const { userId } = await auth();
+
     const userProgress = await getUserProgress();
-    if(!userId || !userProgress?.activeCourseId) {
+
+    if (!userId || !userProgress?.activeCourseId) {
         return [];
     }
 
@@ -101,7 +103,13 @@ export const getCourseProgress = cache(async () => {
         },
     });
 
+    // Find the first uncompleted lesson
     const firstUncompletedLesson = unitsInActiveCourse.flatMap((unit) => unit.lessons).find((lesson) => {
+        // If the lesson has no challenges, consider it uncompleted
+        if (!lesson.challenges || lesson.challenges.length === 0) {
+            return true;
+        }
+        // Check if any challenge is uncompleted
         return lesson.challenges.some((challenge) => {
             return !challenge.challengeProgress
                 || challenge.challengeProgress.length === 0
@@ -114,6 +122,7 @@ export const getCourseProgress = cache(async () => {
         activeLessonId: firstUncompletedLesson?.id,
     };
 });
+
 
 
 export const getLesson = cache(async (id?: number) => {
