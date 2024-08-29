@@ -1,8 +1,9 @@
 "use server";
 
 import database from "@/database/drizzle";
+import { and, eq } from "drizzle-orm";
 import { getCourseById, getUserProgress } from "@/database/queries";
-import { userProgress } from "@/database/schema";
+import { challengeProgress, challenges, userProgress } from "@/database/schema";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -52,4 +53,60 @@ export const upsertUserProgress = async (courseId: number) => {
     redirect("/learn");
 
 
+};
+
+
+export type ReduceHeartsResult = { error: string };
+
+export const reduceHearts = async (challengeId: number): Promise<ReduceHeartsResult> => {
+    const { userId } = await auth();
+
+    if (!userId) {
+        return { error: "Unauthorized" };
+    }
+
+    const currentUserProgress = await getUserProgress();
+
+    const challenge = await database.query.challenges.findFirst({
+        where: eq(challenges.id, challengeId),
+    });
+
+    if (!challenge) {
+        return { error: "Challenge not found" };
+    }
+
+    const lessonId = challenge.lessonId;
+
+    const existingChallengeProgress = await database.query.challengeProgress.findFirst({
+        where: and(
+            eq(challengeProgress.userId, userId),
+            eq(challengeProgress.challengeId, challengeId),
+        )
+    });
+
+    const isPractice = !!existingChallengeProgress;
+
+    if (isPractice) {
+        return { error: "practice" };
+    }
+
+    if (!currentUserProgress) {
+        return { error: "User progress not found" };
+    }
+
+    if (currentUserProgress.hearts === 0) {
+        return { error: "hearts" };
+    }
+
+    await database.update(userProgress).set({
+        hearts: Math.max(currentUserProgress.hearts - 1, 0),
+    }).where(eq(userProgress.userId, userId));
+
+    revalidatePath("/shop");
+    revalidatePath("/learn");
+    revalidatePath("/quests");
+    revalidatePath("/leaderboard");
+    revalidatePath(`/lesson/${lessonId}`);
+
+    return { error: "" }; // This indicates success with no error
 };
