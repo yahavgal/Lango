@@ -10,7 +10,7 @@ type Props = {
     onCheck: () => void; // Function to handle the check button click event
     status: "correct" | "wrong" | "none" | "completed"; // Status of the lesson or task
     disabled?: boolean; // Flag to disable the check button
-    lessonId?: boolean; // ID of the lesson (optional)
+    lessonId?: number; // ID of the lesson (optional)
 };
 
 // Footer component that renders different elements based on the status
