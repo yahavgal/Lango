@@ -10,12 +10,13 @@ import { Challenge } from "./challenge";
 import { Footer } from "./footer";
 import { upsertChallengeProgress } from "../actions/challenge-progress";
 import { toast } from "sonner";
-import { useAudio, useWindowSize } from "react-use";
+import { useAudio, useWindowSize, useMount } from "react-use";
 import { reduceHearts, ReduceHeartsResult } from "../actions/user-progress";
 import Image from "next/image";
 import { ResultCard } from "./result-card";
 import Confetti from "react-confetti";
 import { useHeartsModal } from "@/store/use-hearts-modal";
+import { usePracticeModal } from "@/store/use-practice-modal";
 
 /* Props Type Definition */
 type Props = {
@@ -55,6 +56,13 @@ export const Quiz = ({
     const [finishAudio] = useAudio({ src: "/finish.mp3", autoPlay: true }); // Audio for lesson completion.
 
     const { open: openHeartsModal } = useHeartsModal(); // Modal for displaying when hearts are depleted.
+    const { open: openPracticeModal } = usePracticeModal(); // Modal for displaying when practice mode is activated.
+
+    useMount(() => {
+        if(initialPercentage === 100) {
+            openPracticeModal();
+        }
+    });
 
     const [
         correctAudio,
@@ -69,7 +77,9 @@ export const Quiz = ({
     const [pending, startTransition] = useTransition(); // Handles transitions for async state updates.
     const [lessonId] = useState(initialLessonId); // State for the current lesson ID.
     const [hearts, setHearts] = useState(initialHearts); // State for the user's hearts (lives).
-    const [percentage, setPercentage] = useState(initialPercentage); // State for the lesson completion percentage.
+    const [percentage, setPercentage] = useState(() => {
+        return initialPercentage === 100 ? 0 : initialPercentage;
+    }); // State for the lesson completion percentage.
     const [challenges] = useState(initialLessonChallenges); // State for the array of challenges.
 
     const [activeIndex, setActiveIndex] = useState(() => {
